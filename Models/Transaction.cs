@@ -5,7 +5,7 @@ using CheckRegister.Services;
 
 
 
-class Transaction
+public class Transaction
 {
 
     public enum TypeTrans
@@ -94,15 +94,19 @@ class Transaction
     }
 
     public string formatTransactions(Transaction transaction) {
-        return $"{"Date",-60}{"Transaction Type",-18}{"Transaction Media",20}" +
-        $"{"Amount",20:C}{"Balance",20:C}{"Category",-20}{"Memo",-50}\n" +
-            $"{transaction.TransDate.ToString("MM/dd/yyyy"),-60}{transaction.TransType.ToString(),-18}" +
-            $"{transaction.TransMedia.ToString(),-20}{transaction.Amount.ToString(),20}{transaction.EndingBalance.ToString(),20}" +
-            $"{(transaction.Category.ToString(), -20)}{transaction.TransMemo?.ToString() ?? "",-50}" +
-            "\n";
+        string summary = new TransactionSummary(1, transaction.Amount).ToString(); 
+
+        string formattedString = $"{"Date",-60}{"Transaction Type",-18}{"Transaction Media",20}" +
+         $"{"Amount",20:C}{"Balance",20:C}{"Category",-20}{"Memo",-50}\n" +
+             $"{transaction.TransDate.ToString("MM/dd/yyyy"),-60}{transaction.TransType.ToString(),-18}" +
+             $"{transaction.TransMedia.ToString(),-20}{transaction.Amount.ToString(),20}{transaction.EndingBalance.ToString(),20}" +
+             $"{(transaction.Category.ToString(), -20)}{transaction.TransMemo?.ToString() ?? "",-50}" +
+             "\n";
+        formattedString += summary;
+        return formattedString;
     }
 
-    public string FormatTransactions(Transaction[] transactions) {
+    public static string FormatTransactions(List<Transaction> transactions) {
         string formattedTransactions = ""; 
         foreach (var transaction in transactions) {
            formattedTransactions += $"{transaction.TransDate.ToString("MM/dd/yyyy"),-60}{transaction.TransType.ToString(),-18}" +
@@ -113,7 +117,9 @@ class Transaction
 
         string formattedHeader = $"{"Date",-60}{"Transaction Type",-18}{"Transaction Media",20}" +
         $"{"Amount",20:C}{"Balance",20:C}{"Category",-20}{"Memo",-50}\n";
-        return formattedHeader + formattedTransactions;  
+
+        string summary = new TransactionSummary(transactions.Count(), transactions.Sum(t => t.Amount)).ToString();
+        return formattedHeader + formattedTransactions + summary;  
   
     }
  

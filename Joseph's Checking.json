@@ -1,0 +1,51 @@
+{
+  "Balance": 100,
+  "PendingBalance": 100,
+  "CurrencyType": "USD",
+  "AcctStatus": 0,
+  "CreatedAt": "2026-05-27T09:36:26.1699828-06:00",
+  "Transactions": [
+    {
+      "EndingBalance": 100,
+      "Amount": 100,
+      "TransMedia": 0,
+      "Category": 11,
+      "TransId": 0,
+      "AcctId": 0,
+      "TransType": 0,
+      "TransMemo": "Income",
+      "TransDate": "2026-05-27T16:32:18.2236236-06:00",
+      "TransStatus": 0
+    },
+    {
+      "EndingBalance": 0,
+      "Amount": 100,
+      "TransMedia": 3,
+      "Category": 11,
+      "TransId": 0,
+      "AcctId": 0,
+      "TransType": 1,
+      "TransMemo": "Food",
+      "TransDate": "2026-05-27T16:32:18.2244112-06:00",
+      "TransStatus": 0
+    },
+    {
+      "EndingBalance": 100,
+      "Amount": 100,
+      "TransMedia": 0,
+      "Category": 11,
+      "TransId": 0,
+      "AcctId": 0,
+      "TransType": 0,
+      "TransMemo": "Gift",
+      "TransDate": "2026-05-27T16:32:44.0081598-06:00",
+      "TransStatus": 0
+    }
+  ],
+  "AcctId": 0,
+  "UsedId": [0],
+  "AcctName": "Joseph\u0027s Checking",
+  "AcctType": 0,
+  "AcctOwner": "JosephBowen",
+  "AcctNumber": 65975750
+}

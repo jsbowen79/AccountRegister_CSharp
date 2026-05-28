@@ -1,0 +1,29 @@
+{
+  "Balance": 1000,
+  "PendingBalance": 1000,
+  "CurrencyType": "USD",
+  "AcctStatus": 0,
+  "CreatedAt": "2026-05-28T08:09:58.9653402-06:00",
+  "Transactions": [
+    {
+      "EndingBalance": 1000,
+      "Amount": 1000,
+      "TransMedia": 0,
+      "Category": 11,
+      "TransId": 0,
+      "AcctId": 0,
+      "TransType": 0,
+      "TransMemo": "Paycheck",
+      "TransDate": "2026-05-28T08:10:44.3273253-06:00",
+      "TransStatus": 0
+    }
+  ],
+  "AcctId": 0,
+  "UsedId": [
+    0
+  ],
+  "AcctName": "Checking",
+  "AcctType": 0,
+  "AcctOwner": "Purity",
+  "AcctNumber": 32870558
+}

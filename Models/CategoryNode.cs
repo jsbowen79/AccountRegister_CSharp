@@ -57,7 +57,7 @@ public class CategoryNode
     {
         CatName = catName;
     }
-    public CategoryNode BuildNode()
+    public static CategoryNode BuildNode()
     {
 
         CategoryNode Root = new CategoryNode(Category.Root);

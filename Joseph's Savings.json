@@ -1,0 +1,27 @@
+{
+  "Balance": 0,
+  "PendingBalance": 0,
+  "CurrencyType": "USD",
+  "AcctStatus": 0,
+  "CreatedAt": "2026-05-27T09:50:46.9500357-06:00",
+  "Transactions": [
+    {
+      "EndingBalance": 0,
+      "Amount": 100,
+      "TransMedia": 3,
+      "Category": 11,
+      "TransId": 0,
+      "AcctId": 0,
+      "TransType": 1,
+      "TransMemo": "Cash",
+      "TransDate": "2026-05-27T09:51:44.9137734-06:00",
+      "TransStatus": 2
+    }
+  ],
+  "AcctId": 0,
+  "UsedId": [0],
+  "AcctName": "Joseph\u0027s Savings",
+  "AcctType": 1,
+  "AcctOwner": "JosephBowen",
+  "AcctNumber": 93010126
+}

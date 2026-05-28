@@ -12,7 +12,7 @@ using CheckRegister.Services;
 using System.Text.Json;
 using System.IO;
 
-class Account
+public  abstract class Account
 {
     public enum Type
     {
@@ -37,26 +37,22 @@ class Account
     public string CurrencyType { get; set; }
     public AccountStatus AcctStatus { get; set; }
     public DateTime CreatedAt { get; set; }
-    public List<Transaction> Transactions { get; private set; } = [];
+    public List<Transaction> Transactions { get; set; } = [];
 
-    public int AcctId { get; }
-    public CategoryNode.Category Category { get; set; }
-    public List<int> UsedId { get; private set; }
-    private int NextTrans;
+    public int AcctId { get; private set; }
+    public List<int> UsedId { get; set; }
     public string AcctName { get; private set; }
     public Type AcctType { get; private set; }
     public string AcctOwner { get; private set; }
-    public int AcctNumber { get; }
+    public int AcctNumber { get; private set; }
 
     public Account(
         string currencyType,
-        CategoryNode.Category category,
         string acctName,
         Type acctType,
         string acctOwner)
     {
         CurrencyType = currencyType;
-        Category = category;
         UsedId = new List<int>();
         AcctName = acctName;
         AcctType = acctType;
@@ -69,6 +65,41 @@ class Account
         UsedId.Add(AcctId);
         AcctNumber = Utilities.FindUnusedRandomInt(UsedId);
     }
+
+    protected Account(
+    string currencyType,
+    string acctName,
+    Type acctType,
+    string acctOwner,
+    decimal balance,
+    decimal pendingBalance,
+    AccountStatus acctStatus,
+    DateTime createdAt,
+    int acctNumber,
+    int acctId,
+    List<Transaction> transactions,
+    List<int> usedId)
+{
+    CurrencyType = currencyType;
+    AcctName = acctName;
+    AcctType = acctType;
+    AcctOwner = acctOwner;
+
+    Balance = balance;
+    PendingBalance = pendingBalance;
+
+    AcctStatus = acctStatus;
+
+    CreatedAt = createdAt;
+
+    AcctNumber = acctNumber;
+
+    AcctId = acctId;
+
+    Transactions = transactions;
+
+    UsedId = usedId;
+}
 
     public void AddTransaction(Transaction entry)
     {
@@ -131,7 +162,8 @@ class Account
   public async Task<Services.TransactionResponse> SaveAccountInfo() {
         string message;
     try {
-      string jsonData = JsonSerializer.Serialize(this,
+            AccountDto dto = AccountMapper.ToDto(this);
+      string jsonData = JsonSerializer.Serialize(dto,
       new JsonSerializerOptions
       {
           WriteIndented = true
@@ -148,12 +180,20 @@ class Account
       return new Services.TransactionResponse(true,  message);
     } 
 
+
  public static async Task<Account?> LoadAccountInfo(string filename)
     {
         try
         {
-        string jsonString = await File.ReadAllTextAsync(filename);
-        Account? account = JsonSerializer.Deserialize<Account>(jsonString);
+            string jsonString = await File.ReadAllTextAsync(filename);
+           AccountDto? dto  =
+            JsonSerializer.Deserialize<AccountDto>(jsonString);
+            if (dto == null)
+            {
+                throw new Exception("Load failed.");
+            }
+            Account account = AccountMapper.ToAccount(dto);
+            account.CalculateBalance(); 
         return account; 
         } catch (Exception ex)
         {
@@ -166,14 +206,14 @@ class Account
 
 
     public async Task<TransactionResponse> DepositAsync(
+        int transId,
         decimal amount,
         Transaction.Medium transMedia,
         CategoryNode.Category category,
-        string transMemo = "")
+        string transMemo = "" )
     {
         if (Utilities.ValidateAmount(amount))
         {
-            int transId = Utilities.FindUnusedRandomInt(this.UsedId);
             Transaction entry = new Transaction(
               amount,
               transMedia,
@@ -188,6 +228,7 @@ class Account
 
             (decimal, decimal) balances = this.CalculateBalance();
             (this.Balance, this.PendingBalance) = balances;
+            Console.WriteLine($" this balances: {this.Balance}  {this.PendingBalance}");
             await this.SaveAccountInfo();
             return new Services.TransactionResponse(true,
             $"Your new available balance is {this.Balance}. Your balance Pending is {this.PendingBalance}.  Thank you!");
@@ -199,50 +240,60 @@ class Account
         }
 
     }
-    
 
-  public async Task<TransactionResponse> WithdrawAsync(
-    Decimal amount,
-    Transaction.Medium transMedia,
-    CategoryNode.Category category,
-    string transMemo = ""){
-    if (!Utilities.ValidateAmount(amount)) {
-      return new Services.TransactionResponse (false, "Amount is invalid.  Please try again");
-    }
-    Transaction.TypeTrans transType = Transaction.TypeTrans.Debit;
-    int transId = Utilities.FindUnusedRandomInt(this.UsedId);
-    Transaction entry = new Transaction(
-      amount,
-      transMedia,
-      category,
-      transId,
-      this.AcctId,
-      transType,
-      transMemo ?? null
-    );
-      if (amount <= this.Balance) {
-        string message = entry.DetermineStatus().ToString();
-        if (entry.TransStatus != Transaction.Status.Declined) {
-          this.AddTransaction(entry);
-          (Decimal, Decimal) balances = this.CalculateBalance();
-          (this.Balance, this.PendingBalance) = balances;
-          await this.SaveAccountInfo();
-          return new TransactionResponse(true,
-          $"Your new available balance is {this.Balance}. Your balance Pending is {this.PendingBalance}.  Thank you!");
-        } else {
-          this.AddTransaction(entry);
-          await this.SaveAccountInfo();
-          return new TransactionResponse(false,
-          $"Sorry, your transaction status was {message}. Please check your information and try again." );
+
+    public async Task<TransactionResponse> WithdrawAsync(
+      int transId,
+      Decimal amount,
+      Transaction.Medium transMedia,
+      CategoryNode.Category category,
+      string transMemo = "")
+    {
+        if (!Utilities.ValidateAmount(amount))
+        {
+            return new Services.TransactionResponse(false, "Amount is invalid.  Please try again");
         }
-      } else {
-        entry.TransStatus = Transaction.Status.Declined;
-        this.AddTransaction(entry);
-        this.CalculateBalance();
-        await this.SaveAccountInfo();
-        return new TransactionResponse (false, "Transaction declined--Insufficient funds") ;
-      }
-    
+        Transaction.TypeTrans transType = Transaction.TypeTrans.Debit;
+        Transaction entry = new Transaction(
+          amount,
+          transMedia,
+          category,
+          transId,
+          this.AcctId,
+          transType,
+          transMemo ?? null
+        );
+        if (amount <= this.Balance)
+        {
+            string message = entry.DetermineStatus().ToString();
+            if (entry.TransStatus != Transaction.Status.Declined)
+            {
+                this.AddTransaction(entry);
+                (Decimal, Decimal) balances = this.CalculateBalance();
+                (this.Balance, this.PendingBalance) = balances;
+                await this.SaveAccountInfo();
+                return new TransactionResponse(true,
+                $"Your new available balance is {this.Balance}. Your balance Pending is {this.PendingBalance}.  Thank you!");
+            }
+            else
+            {
+                this.AddTransaction(entry);
+                await this.SaveAccountInfo();
+                return new TransactionResponse(false,
+                $"Sorry, your transaction status was {message}. Please check your information and try again.");
+            }
+        }
+        else
+        {
+            entry.TransStatus = Transaction.Status.Declined;
+            this.AddTransaction(entry);
+            this.CalculateBalance();
+            await this.SaveAccountInfo();
+            return new TransactionResponse(false, "Transaction declined--Insufficient funds");
+        }
+
     }
+    
+    public abstract string GetAccountType();
 
 }
