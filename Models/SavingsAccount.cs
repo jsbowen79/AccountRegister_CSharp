@@ -1,7 +1,13 @@
 using System.Security.AccessControl;
 
 namespace CheckRegister.Models; 
-
+/**************************************************************************************************************************************************
+* Child class of Class Account.  Provides the constructors to initialize an account of type Savings.  
+*
+*
+*
+*
+****************************************************************************************************************************************************/
 public class SavingsAccount: Account
 {
     public SavingsAccount(
@@ -50,7 +56,7 @@ public class SavingsAccount: Account
             usedId)
     {
     }
-
+    // Override to return account type Savings. 
     public override string GetAccountType()
     {
         return "Savings";

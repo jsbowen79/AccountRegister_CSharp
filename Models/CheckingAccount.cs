@@ -1,6 +1,14 @@
-namespace CheckRegister.Models; 
+namespace CheckRegister.Models;
 
-public class CheckingAccount: Account
+
+/**************************************************************************************************************************************************
+* Child class of Account.  Provides constructors to initialize an account for a Checking Account type.  
+*
+*
+*
+*
+****************************************************************************************************************************************************/
+public class CheckingAccount : Account
 {
     public CheckingAccount(
         string currencyType,
@@ -9,48 +17,48 @@ public class CheckingAccount: Account
         string acctOwner
 ) : base(currencyType, acctName, acctType, acctOwner) { }
 
-     public CheckingAccount(
-        string currencyType,
-        string acctName,
-        Type acctType,
-        string acctOwner,
+    public CheckingAccount(
+       string currencyType,
+       string acctName,
+       Type acctType,
+       string acctOwner,
 
-        decimal balance,
-        decimal pendingBalance,
+       decimal balance,
+       decimal pendingBalance,
 
-        AccountStatus acctStatus,
+       AccountStatus acctStatus,
 
-        DateTime createdAt,
+       DateTime createdAt,
 
-        int acctNumber,
-        int acctId,
+       int acctNumber,
+       int acctId,
 
-        List<Transaction> transactions,
-        List<int> usedId)
+       List<Transaction> transactions,
+       List<int> usedId)
 
-        : base(
-            currencyType,
-            acctName,
-            acctType,
-            acctOwner,
+       : base(
+           currencyType,
+           acctName,
+           acctType,
+           acctOwner,
 
-            balance,
-            pendingBalance,
+           balance,
+           pendingBalance,
 
-            acctStatus,
+           acctStatus,
 
-            createdAt,
+           createdAt,
 
-            acctNumber,
-            acctId,
+           acctNumber,
+           acctId,
 
-            transactions,
-            usedId)
+           transactions,
+           usedId)
     {
     }
-
+    // Override to provide account type Checking. 
     public override string GetAccountType()
     {
         return "Checking";
-    }  
+    }
 }

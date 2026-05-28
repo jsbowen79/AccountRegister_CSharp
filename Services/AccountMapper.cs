@@ -1,131 +1,143 @@
 namespace CheckRegister.Services;
 using System.Dynamic;
 using CheckRegister.Models;
-public static class AccountMapper{
+/**************************************************************************************************************************************************
+* This class provides the logic for taking the information in the Account Data Transfer Object (AccountDto) class and creating the appropriate  
+* Account Object with it depending on the AccountType.  This ensures that all accounts are recreated as Savings, Checking, MoneyMarket, or Credit
+* Accounts.  It also initializes the list objects in the accounts to prevent deserialization errors in the repopulation of those lists. 
+*
+*
+****************************************************************************************************************************************************/
 
-   public static Account ToAccount(AccountDto dto)
+public static class AccountMapper
 {
-    switch (dto.AcctType)
+    //Provides logic for transformation of DTO to an assembled Account object.
+    public static Account ToAccount(AccountDto dto)
     {
-        case Account.Type.Checking:
+        switch (dto.AcctType)
+        {
+            case Account.Type.Checking:
 
-            return new CheckingAccount(
-                dto.CurrencyType,
-                dto.AcctName,
-                dto.AcctType,
-                dto.AcctOwner,
+                return new CheckingAccount(
+                    dto.CurrencyType,
+                    dto.AcctName,
+                    dto.AcctType,
+                    dto.AcctOwner,
 
-                dto.Balance,
-                dto.PendingBalance,
+                    dto.Balance,
+                    dto.PendingBalance,
 
-                dto.AcctStatus,
+                    dto.AcctStatus,
 
-                dto.CreatedAt,
+                    dto.CreatedAt,
 
-                dto.AcctNumber,
-                dto.AcctId,
+                    dto.AcctNumber,
+                    dto.AcctId,
 
-                dto.Transactions ?? new List<Transaction>(),
-                dto.UsedId ?? new List<int>()
-            );
+                    dto.Transactions ?? new List<Transaction>(),
+                    dto.UsedId ?? new List<int>()
+                );
 
-        case Account.Type.Savings:
+            case Account.Type.Savings:
 
-            return new SavingsAccount(
-                dto.CurrencyType,
-                dto.AcctName,
-                dto.AcctType,
-                dto.AcctOwner,
+                return new SavingsAccount(
+                    dto.CurrencyType,
+                    dto.AcctName,
+                    dto.AcctType,
+                    dto.AcctOwner,
 
-                dto.Balance,
-                dto.PendingBalance,
+                    dto.Balance,
+                    dto.PendingBalance,
 
-                dto.AcctStatus,
+                    dto.AcctStatus,
 
-                dto.CreatedAt,
+                    dto.CreatedAt,
 
-                dto.AcctNumber,
-                dto.AcctId,
+                    dto.AcctNumber,
+                    dto.AcctId,
 
-                dto.Transactions ?? new List<Transaction>(),
-                dto.UsedId ?? new List<int>()
-            );
+                    dto.Transactions ?? new List<Transaction>(),
+                    dto.UsedId ?? new List<int>()
+                );
 
-        case Account.Type.MoneyMarket:
+            case Account.Type.MoneyMarket:
 
-            return new MoneyMarketAccount(
-                dto.CurrencyType,
-                dto.AcctName,
-                dto.AcctType,
-                dto.AcctOwner,
+                return new MoneyMarketAccount(
+                    dto.CurrencyType,
+                    dto.AcctName,
+                    dto.AcctType,
+                    dto.AcctOwner,
 
-                dto.Balance,
-                dto.PendingBalance,
+                    dto.Balance,
+                    dto.PendingBalance,
 
-                dto.AcctStatus,
+                    dto.AcctStatus,
 
-                dto.CreatedAt,
+                    dto.CreatedAt,
 
-                dto.AcctNumber,
-                dto.AcctId,
+                    dto.AcctNumber,
+                    dto.AcctId,
 
-                dto.Transactions ?? new List<Transaction>(),
-                dto.UsedId ?? new List<int>()
-            );
+                    dto.Transactions ?? new List<Transaction>(),
+                    dto.UsedId ?? new List<int>()
+                );
 
-        case Account.Type.Credit:
+            case Account.Type.Credit:
 
-            return new CreditAccount(
-                dto.CurrencyType,
-                dto.AcctName,
-                dto.AcctType,
-                dto.AcctOwner,
+                return new CreditAccount(
+                    dto.CurrencyType,
+                    dto.AcctName,
+                    dto.AcctType,
+                    dto.AcctOwner,
 
-                dto.Balance,
-                dto.PendingBalance,
+                    dto.Balance,
+                    dto.PendingBalance,
 
-                dto.AcctStatus,
+                    dto.AcctStatus,
 
-                dto.CreatedAt,
+                    dto.CreatedAt,
 
-                dto.AcctNumber,
-                dto.AcctId,
+                    dto.AcctNumber,
+                    dto.AcctId,
 
-                dto.Transactions ?? new List<Transaction>(),
-                dto.UsedId ?? new List<int>()
-            );
+                    dto.Transactions ?? new List<Transaction>(),
+                    dto.UsedId ?? new List<int>()
+                );
 
-        default:
-            throw new Exception("Unknown account type.");
+            default:
+                throw new Exception("Unknown account type.");
+        }
     }
-}
-   public static AccountDto ToDto(Account account)
-{
-    return new AccountDto
+
+    //Provides logic for the destruction of an Account Object and creation of an 
+    //Account Data Transfer Object (Dto)
+    public static AccountDto ToDto(Account account)
     {
-        Balance = account.Balance,
-        PendingBalance = account.PendingBalance,
+        return new AccountDto
+        {
+            Balance = account.Balance,
+            PendingBalance = account.PendingBalance,
 
-        CurrencyType = account.CurrencyType,
+            CurrencyType = account.CurrencyType,
 
-        AcctStatus = account.AcctStatus,
+            AcctStatus = account.AcctStatus,
 
-        CreatedAt = account.CreatedAt,
+            CreatedAt = account.CreatedAt,
 
-        Transactions = account.Transactions,
+            Transactions = account.Transactions,
 
-        AcctId = account.AcctId,
+            AcctId = account.AcctId,
 
-        UsedId = account.UsedId,
+            UsedId = account.UsedId,
 
-        AcctName = account.AcctName,
+            AcctName = account.AcctName,
 
-        AcctType = account.AcctType,
+            AcctType = account.AcctType,
 
-        AcctOwner = account.AcctOwner,
+            AcctOwner = account.AcctOwner,
 
-        AcctNumber = account.AcctNumber
-    };
-}
+            AcctNumber = account.AcctNumber
+        };
+    }
 
 }

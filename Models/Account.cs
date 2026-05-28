@@ -1,4 +1,4 @@
-namespace CheckRegister.Models;
+ namespace CheckRegister.Models;
 
 using System.Buffers;
 using System.ComponentModel.Design.Serialization;
@@ -12,7 +12,15 @@ using CheckRegister.Services;
 using System.Text.Json;
 using System.IO;
 
-public  abstract class Account
+/**************************************************************************************************************************************************
+* This is the Parent Account Class which identifies all of the variables and methods that are used in any Account.  It includes   
+* Constructors for normal account creation and rebuilding of accounts after JSON deserialization.  Variables are public, but many have private set 
+* so that they can only be modified within this class. Methods include: AddTransaction, GetTransactionHistory, CalculateBalance, SaveAccountInfo,
+* LoadAccountInfo, DepositAsync, WithdrawAsync, and GetAccountType.
+*
+****************************************************************************************************************************************************/
+
+public abstract class Account
 {
     public enum Type
     {
@@ -79,42 +87,49 @@ public  abstract class Account
     int acctId,
     List<Transaction> transactions,
     List<int> usedId)
-{
-    CurrencyType = currencyType;
-    AcctName = acctName;
-    AcctType = acctType;
-    AcctOwner = acctOwner;
+    {
+        CurrencyType = currencyType;
+        AcctName = acctName;
+        AcctType = acctType;
+        AcctOwner = acctOwner;
 
-    Balance = balance;
-    PendingBalance = pendingBalance;
+        Balance = balance;
+        PendingBalance = pendingBalance;
 
-    AcctStatus = acctStatus;
+        AcctStatus = acctStatus;
 
-    CreatedAt = createdAt;
+        CreatedAt = createdAt;
 
-    AcctNumber = acctNumber;
+        AcctNumber = acctNumber;
 
-    AcctId = acctId;
+        AcctId = acctId;
 
-    Transactions = transactions;
+        Transactions = transactions;
 
-    UsedId = usedId;
-}
+        UsedId = usedId;
+    }
 
+    // Adds transaction to Transactions List
     public void AddTransaction(Transaction entry)
     {
         this.Transactions.Add(entry);
     }
 
-  //This function was designed to allow for the UI to display groups of transactions on the screen
-  //using forward and back buttons.
+    //This method was designed to allow for the UI to display groups of transactions on the screen
+    //using forward and back buttons.
 
-  public List<Transaction> getTransactionHistory(int start, int qty) {
-    if (qty < this.Transactions.Count-start && qty > 0) {
-      return this.Transactions.GetRange(start, qty);
-    } else return this.Transactions.GetRange(start, Transactions.Count-start);
-  }
+    public List<Transaction> getTransactionHistory(int start, int qty)
+    {
+        if (qty < this.Transactions.Count - start && qty > 0)
+        {
+            return this.Transactions.GetRange(start, qty);
+        }
+        else return this.Transactions.GetRange(start, Transactions.Count - start);
+    }
 
+
+    //This method dynamically calculates the account balance by looping through all transactions each
+    //time it is run to ensure accurate balances based on predetermined business rules.  
     private (decimal, decimal) CalculateBalance()
     {
         decimal availableBalance = 0;
@@ -158,59 +173,70 @@ public  abstract class Account
 
         return (availableBalance, pendingBalance);
     }
-  
-  public async Task<Services.TransactionResponse> SaveAccountInfo() {
-        string message;
-    try {
-            AccountDto dto = AccountMapper.ToDto(this);
-      string jsonData = JsonSerializer.Serialize(dto,
-      new JsonSerializerOptions
-      {
-          WriteIndented = true
-      });
 
-      await File.WriteAllTextAsync($"{this.AcctName}.json", jsonData);
+
+    //This method converts account information into a format that can be used to restore all 
+    //objects with correct properties.  It then converts the information to a JSON string and 
+    //saves the JSON string as a .json file in the root directory. 
+    public async Task<Services.TransactionResponse> SaveAccountInfo()
+    {
+        string message;
+        try
+        {
+            AccountDto dto = AccountMapper.ToDto(this);
+            string jsonData = JsonSerializer.Serialize(dto,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            await File.WriteAllTextAsync($"{this.AcctName}.json", jsonData);
             Console.WriteLine("File has been Saved.");
             message = $"{this.AcctName}.json has been successfully saved.";
-    }catch (Exception) {
+        }
+        catch (Exception)
+        {
             message = "There was an error saving the file.";
-            throw new ArgumentException(); 
+            throw new ArgumentException();
+        }
+
+        return new Services.TransactionResponse(true, message);
     }
 
-      return new Services.TransactionResponse(true,  message);
-    } 
+    //This method retrieves a JSON string from a file and deserializes it into C#.  It then 
+    //recreates all objects and their properties to form a functional Account object. 
 
-
- public static async Task<Account?> LoadAccountInfo(string filename)
+    public static async Task<Account?> LoadAccountInfo(string filename)
     {
         try
         {
             string jsonString = await File.ReadAllTextAsync(filename);
-           AccountDto? dto  =
-            JsonSerializer.Deserialize<AccountDto>(jsonString);
+            AccountDto? dto =
+             JsonSerializer.Deserialize<AccountDto>(jsonString);
             if (dto == null)
             {
                 throw new Exception("Load failed.");
             }
             Account account = AccountMapper.ToAccount(dto);
-            account.CalculateBalance(); 
-        return account; 
-        } catch (Exception ex)
+            account.CalculateBalance();
+            return account;
+        }
+        catch (Exception ex)
         {
             Console.WriteLine($"Load Failed {ex.Message}");
-            return null; 
+            return null;
         }
     }
 
 
-
+    //This method adds a deposit transaction to an account.
 
     public async Task<TransactionResponse> DepositAsync(
         int transId,
         decimal amount,
         Transaction.Medium transMedia,
         CategoryNode.Category category,
-        string transMemo = "" )
+        string transMemo = "")
     {
         if (Utilities.ValidateAmount(amount))
         {
@@ -241,6 +267,7 @@ public  abstract class Account
 
     }
 
+    //This method adds a withdrawal transaction to an account. 
 
     public async Task<TransactionResponse> WithdrawAsync(
       int transId,
@@ -293,7 +320,10 @@ public  abstract class Account
         }
 
     }
-    
+
+    //This function provides the skeleton for override functions in child classes to return the account Type. 
+    //It returns nothing here because Account is an Abstract class that cannot be called except through the 
+    //Child classes.  As such no strictly "Account" objects are possible. 
     public abstract string GetAccountType();
 
 }

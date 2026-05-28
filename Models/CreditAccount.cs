@@ -1,6 +1,14 @@
-namespace CheckRegister.Models; 
+namespace CheckRegister.Models;
 
-public class CreditAccount: Account
+/**************************************************************************************************************************************************
+* Child class of Class Account.  Provides constructors to initialize an account of type Credit. 
+*
+*
+*
+*
+****************************************************************************************************************************************************/
+
+public class CreditAccount : Account
 {
     public CreditAccount(
         string currencyType,
@@ -9,48 +17,48 @@ public class CreditAccount: Account
         string acctOwner
 ) : base(currencyType, acctName, acctType, acctOwner) { }
 
- public CreditAccount(
-        string currencyType,
-        string acctName,
-        Type acctType,
-        string acctOwner,
+    public CreditAccount(
+           string currencyType,
+           string acctName,
+           Type acctType,
+           string acctOwner,
 
-        decimal balance,
-        decimal pendingBalance,
+           decimal balance,
+           decimal pendingBalance,
 
-        AccountStatus acctStatus,
+           AccountStatus acctStatus,
 
-        DateTime createdAt,
+           DateTime createdAt,
 
-        int acctNumber,
-        int acctId,
+           int acctNumber,
+           int acctId,
 
-        List<Transaction> transactions,
-        List<int> usedId)
+           List<Transaction> transactions,
+           List<int> usedId)
 
-        : base(
-            currencyType,
-            acctName,
-            acctType,
-            acctOwner,
+           : base(
+               currencyType,
+               acctName,
+               acctType,
+               acctOwner,
 
-            balance,
-            pendingBalance,
+               balance,
+               pendingBalance,
 
-            acctStatus,
+               acctStatus,
 
-            createdAt,
+               createdAt,
 
-            acctNumber,
-            acctId,
+               acctNumber,
+               acctId,
 
-            transactions,
-            usedId)
+               transactions,
+               usedId)
     {
     }
-
+    // Override to return account Type Credit. 
     public override string GetAccountType()
     {
         return "Savings";
-    }  
+    }
 }

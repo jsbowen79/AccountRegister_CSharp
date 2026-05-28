@@ -6,14 +6,28 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using CheckRegister.Models;
-using CheckRegister.Services; 
-public class MenuFunctions{
+using CheckRegister.Services;
 
-private readonly ApplicationState _appState; 
-public MenuFunctions (ApplicationState appState)
+/**************************************************************************************************************************************************
+* This Class provides all of the methods called by the menu class.  These methods create relevant objects and pass control of those objects along  
+* with the _appState object to the classes that will actually perform the requested actions.  When necessary, these functions gather additional
+* information from the user as needed by the requested operation. 
+*
+*
+****************************************************************************************************************************************************/
+
+public class MenuFunctions
 {
-    _appState = appState; 
-}
+
+    private readonly ApplicationState _appState;
+    public MenuFunctions(ApplicationState appState)
+    {
+        _appState = appState;
+    }
+
+    //Gathers information from user necessary to create an account.  Validates information
+    // obtained from user. Calls Account Class to create account.
+
     public void StartCreateAccount()
     {
         string acctOwner = "";
@@ -47,9 +61,10 @@ public MenuFunctions (ApplicationState appState)
                 Console.WriteLine("Please enter an account Name (string).");
             }
 
-        };
-          
-        
+        }
+        ;
+
+
         valid = false;
         while (!valid)
         {
@@ -78,31 +93,31 @@ public MenuFunctions (ApplicationState appState)
             Console.WriteLine("For Money Market, press 3: ");
             Console.WriteLine("For Credit Account, press 4:");
             int selection = int.TryParse(Console.ReadLine(), out int result) ? result : 0;
-          
+
             switch (selection)
             {
                 case 1:
                     acctType = Account.Type.Checking;
                     Account account = new CheckingAccount(currencyType, acctName, acctType, acctOwner);
-                    InitializeAccount(account); 
+                    InitializeAccount(account);
                     valid = true;
                     break;
                 case 2:
                     acctType = Account.Type.Savings;
                     account = new SavingsAccount(currencyType, acctName, acctType, acctOwner);
-                    InitializeAccount(account); 
+                    InitializeAccount(account);
                     valid = true;
                     break;
                 case 3:
                     acctType = Account.Type.MoneyMarket;
                     account = new MoneyMarketAccount(currencyType, acctName, acctType, acctOwner);
-                    InitializeAccount(account); 
+                    InitializeAccount(account);
                     valid = true;
                     break;
                 case 4:
-                    acctType = Account.Type.Credit; 
+                    acctType = Account.Type.Credit;
                     account = new CreditAccount(currencyType, acctName, acctType, acctOwner);
-                    InitializeAccount(account); 
+                    InitializeAccount(account);
                     valid = true;
                     break;
                 default:
@@ -110,20 +125,27 @@ public MenuFunctions (ApplicationState appState)
                     break;
             }
             ;
-        };
-        
-   
+        }
+        ;
+
+
     }
+
+    //Adds accounts to the _appState object so that it can be accessed and used globally.
+    //Provides user with a message indicating success of operation. 
+
     private void InitializeAccount(Account account)
     {
-        
+
         _appState.Accounts.Add(account);
         _appState.CurrentAccount = account;
         Console.WriteLine($"Congratulations, you have created Account {_appState.CurrentAccount.AcctName}. ");
         Console.WriteLine("Future operations will utilize this account.");
     }
-    
 
+    //Gathers information necessary to add a transaction to an account.  Validates that 
+    // information.  Initiates creation of the transaction.  Saves transaction to Account
+    // object.  Provides user with appropriate message. 
 
     public async Task StartAddTransaction()
     {
@@ -158,8 +180,8 @@ public MenuFunctions (ApplicationState appState)
                 Console.WriteLine("Invalid input for amount.  Please input a number.");
             }
         }
-        bool invalid = true; 
-        while(invalid)
+        bool invalid = true;
+        while (invalid)
         {
             Console.WriteLine("Please choose from the following Transaction Media Types: \n\n");
             Console.WriteLine("Press 1 for Cash ");
@@ -188,13 +210,14 @@ public MenuFunctions (ApplicationState appState)
                     break;
                 case 5:
                     transMedia = Transaction.Medium.Check;
-                    invalid = false; 
+                    invalid = false;
                     break;
                 default:
                     Console.WriteLine("Please make a valid selection (1-5).");
                     continue;
-            } 
-        };
+            }
+        }
+        ;
         Console.WriteLine("\n\nWhat kind of transaction would you like to make?");
         Console.WriteLine("Select 1 for DEPOSIT or 2 for WITHDRAWAL. ");
         response = int.TryParse(Console.ReadLine(), out result) ? result : 0;
@@ -221,20 +244,22 @@ public MenuFunctions (ApplicationState appState)
                 break;
             default:
                 Console.WriteLine("Invalid Selection.  Please try again.");
-                return; 
-        } 
+                return;
+        }
 
         if (transResponse.Success)
         {
             Console.WriteLine($"\n\nYour transaction is complete.  {transResponse.Message}");
             return;
-        } else
+        }
+        else
         {
             Console.WriteLine($"Transaction failed.  {transResponse.Message}");
-            return; 
+            return;
         }
     }
 
+    //Prints a list of requested transactions to the console in a user readable table. 
 
     public async Task StartListTransactions()
     {
@@ -243,33 +268,38 @@ public MenuFunctions (ApplicationState appState)
             int totalTrans = _appState.CurrentAccount.Transactions.Count;
             if (totalTrans > 0)
             {
-            Console.WriteLine($"\n\nThere are {totalTrans} transactions in " +
-            $"{_appState.CurrentAccount.AcctName}.  How many would you like to view?");
-            Console.WriteLine($"Please enter an integer between 1 and {totalTrans}.\n\n");
-            int recordCount = int.TryParse(Console.ReadLine(), out int result) ? result : totalTrans;
+                Console.WriteLine($"\n\nThere are {totalTrans} transactions in " +
+                $"{_appState.CurrentAccount.AcctName}.  How many would you like to view?");
+                Console.WriteLine($"Please enter an integer between 1 and {totalTrans}.\n\n");
+                int recordCount = int.TryParse(Console.ReadLine(), out int result) ? result : totalTrans;
 
-            Console.WriteLine($"\n\nPrinting the last {recordCount} transactions.\n\n");
-            string formattedString = Transaction.FormatTransactions(_appState.CurrentAccount.Transactions);
-            Console.WriteLine(formattedString);
+                Console.WriteLine($"\n\nPrinting the last {recordCount} transactions.\n\n");
+                string formattedString = Transaction.FormatTransactions(_appState.CurrentAccount.Transactions);
+                Console.WriteLine(formattedString);
             }
             else
             {
                 Console.WriteLine($"\n\nThere are no transactions in Account {_appState.CurrentAccount.AcctName}");
                 Console.WriteLine("Please choose another account.\n\n");
-            };
-        } else
+            }
+            ;
+        }
+        else
         {
             Console.WriteLine($"There is no active account.  Please Create" +
             " or Load an account to see transactions.");
-            return; 
-;       }
-            
+            return;
+            ;
+        }
+
     }
+
+    //Displays a Demo of C# Unions on the Console. 
 
     public static void StartUnionDemo()
     {
         NumberUnion number = new NumberUnion();
-        
+
         number.IntegerValue = 1065353216;
 
         Console.WriteLine("\n\nClassic C Unions use the same memory space to store multiple data types.\n");
@@ -280,27 +310,34 @@ public MenuFunctions (ApplicationState appState)
         Console.WriteLine($"\n\nnumber.integerValue: {number.IntegerValue}");
         Console.WriteLine($"number.FloatValue: {number.FloatValue}");
 
-        Console.WriteLine("\n\n As shown, the same data represents different values in a classic C union. ");      
+        Console.WriteLine("\n\n As shown, the same data represents different values in a classic C union. ");
     }
 
+
+    //Gathers information necessary to load an account.  Loads the account.  Provides user with an appropriate message. 
     public async Task StartLoadAccount()
     {
         Console.WriteLine("\n\n Please enter the filename for the account you would like to load.");
         string fileName = Console.ReadLine() ?? "";
         Console.WriteLine($"\n\nAttempting to load {fileName}...\n\n");
-        Account? loadedAccount = await Account.LoadAccountInfo(fileName);  
+        Account? loadedAccount = await Account.LoadAccountInfo(fileName);
 
         if (loadedAccount != null)
         {
             _appState.Accounts.Add(loadedAccount);
             _appState.CurrentAccount = loadedAccount;
             Console.WriteLine($"\n\nLoaded Account {_appState.CurrentAccount.AcctName} Successfully!\n\n");
-            Console.WriteLine($"You have {_appState.Accounts.Count()} accounts currently loaded.\n\n"); 
+            Console.WriteLine($"You have {_appState.Accounts.Count()} accounts currently loaded.\n\n");
         }
     }
+
+    //Switches between accounts that have been created during current session or have been loaded into the 
+    //session by the user.  Allows users to manage multiple accounts simultaneously.  Provides and appropriate
+    //message. 
+
     public void SwitchAccounts()
     {
-        Account? desiredAccount; 
+        Account? desiredAccount;
         Console.WriteLine("You currently have the following Active Accounts:");
         _appState.Accounts.ForEach((account) => { Console.WriteLine($"{account.AcctName}"); });
 
@@ -308,18 +345,20 @@ public MenuFunctions (ApplicationState appState)
         string response = Console.ReadLine() ?? "";
         if (response != "")
         {
-            desiredAccount = _appState.Accounts.FirstOrDefault((account) => account.AcctName == response); 
+            desiredAccount = _appState.Accounts.FirstOrDefault((account) => account.AcctName == response);
             if (desiredAccount != null)
             {
                 _appState.CurrentAccount = desiredAccount;
-                return; 
+                Console.WriteLine($"Loaded Account {_appState.CurrentAccount.AcctName}\nYou are now working with that account.");
+                return;
             }
             else
             {
                 Console.WriteLine("That account does not exist.  Please try again. ");
                 return;
             }
-        } else
+        }
+        else
         {
             Console.WriteLine("You must make an entry.  Please try again. ");
         }

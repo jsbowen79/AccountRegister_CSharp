@@ -3,7 +3,13 @@ namespace CheckRegister.Models;
 using System.Security.Cryptography.X509Certificates;
 using CheckRegister.Services;
 
-
+/**************************************************************************************************************************************************
+* This class defines and creates the structure for a transaction which is stored in an account.  All transactions are created using this class
+* prior to being added to an account.  This ensures that transactions are uniform and meet information standards.  Contains Enums to define Transaction
+* types, transaction status, and transaction mediums.  Contains methods determineStatus and formatTransactions.  DetermineStatus method analyzes 
+* rules to determine if the status of a transaction should be pending, Complete, or Declined.  Returns status so that it can be utilized in the 
+* calculate balance method to provide accurate balances and pendingBalances.
+****************************************************************************************************************************************************/
 
 public class Transaction
 {
@@ -67,15 +73,19 @@ public class Transaction
         TransStatus = this.DetermineStatus();
         TransMemo = transMemo;
         TransDate = DateTime.Now;
-        EndingBalance = 0; 
+        EndingBalance = 0;
 
     }
 
+    // Determines and returns the status of a transaction according to predefined
+    // banking rules. 
 
     public Status DetermineStatus()
     {
-        if (this.TransType == TypeTrans.Credit) {
-            switch (this.TransMedia) {
+        if (this.TransType == TypeTrans.Credit)
+        {
+            switch (this.TransMedia)
+            {
                 case Medium.Cash:
                 case Medium.Transfer:
                     return Status.Complete;
@@ -87,14 +97,20 @@ public class Transaction
                     return Status.Pending;
                 default:
                     return Status.Declined;
-            };
-        } else {
+            }
+            ;
+        }
+        else
+        {
             return Status.Complete;
-        };
+        }
+        ;
     }
 
-    public string formatTransactions(Transaction transaction) {
-        string summary = new TransactionSummary(1, transaction.Amount).ToString(); 
+    //Formats a readable string for a single transaction. 
+    public string formatTransactions(Transaction transaction)
+    {
+        string summary = new TransactionSummary(1, transaction.Amount).ToString();
 
         string formattedString = $"{"Date",-60}{"Transaction Type",-18}{"Transaction Media",20}" +
          $"{"Amount",20:C}{"Balance",20:C}{"Category",-20}{"Memo",-50}\n" +
@@ -105,7 +121,7 @@ public class Transaction
         formattedString += summary;
         return formattedString;
     }
-
+    //formats a readable string for multiple transactions. 
     public static string FormatTransactions(List<Transaction> transactions) {
         string formattedTransactions = ""; 
         foreach (var transaction in transactions) {

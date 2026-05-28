@@ -2,8 +2,19 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace CheckRegister.Models;
 
+/**************************************************************************************************************************************************
+* This class provides the data structures necessary to allow for the categorization of transactions which will eventually allow for the tracking 
+* and analysis of spending habits.  The structure is not fully utilized do to the lack of a useable UI for the feature.  
+*
+*
+*
+****************************************************************************************************************************************************/
 public class CategoryNode
 {
+
+
+    // Lists all of the categories that can be tracked. 
+
     public enum Category
     {
         Housing,
@@ -50,6 +61,9 @@ public class CategoryNode
         OtherTransportation,
         Medical
     }
+
+    //Creates a CategoryNode object to allow for a tree-like category structure. 
+
     public Category CatName { get; set; }
     public List<CategoryNode> Children { get; set; } = [];
 
@@ -57,6 +71,9 @@ public class CategoryNode
     {
         CatName = catName;
     }
+
+    //Creates the root node which is the final structure that will categorize transactions and allow for
+    //data analysis.
     public static CategoryNode BuildNode()
     {
 
@@ -141,6 +158,10 @@ public class CategoryNode
 
     }
 
+    //Uses Recursion to find the category node in the tree to associate with a transaction. 
+    //This allows for all transactions associated with a specific category to be programmatically
+    //linked to the same CategoryNode which allows for faster retrieval and analysis. 
+    
     public CategoryNode? FindCategoryNode(Category target)
     {
         if (this.CatName == target)
@@ -158,13 +179,15 @@ public class CategoryNode
         }
     }
 
-public string ListCategories(List<string>? categoriesList = null){
+    public string ListCategories(List<string>? categoriesList = null)
+    {
         categoriesList ??= new List<string>();
 
-    foreach (var child in this.Children) {
-      categoriesList.Add(child.CatName.ToString());
-      child.ListCategories(categoriesList);
+        foreach (var child in this.Children)
+        {
+            categoriesList.Add(child.CatName.ToString());
+            child.ListCategories(categoriesList);
+        }
+        return string.Join(",", categoriesList);
     }
-    return string.Join(",",categoriesList);
-  }
 }
